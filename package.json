@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Mavrick91/MindGameJam/issues"
   },
-  "homepage": "https://github.com/Mavrick91/MindGameJam#readme"
+  "homepage": "https://github.com/Mavrick91/MindGameJam#readme",
+  "dependencies": {
+    "phaser-ce": "^2.10.0"
+  }
 }
