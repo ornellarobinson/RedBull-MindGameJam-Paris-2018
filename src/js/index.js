@@ -1,49 +1,117 @@
-//
+var sizeTiles = 50;
+var startArrow;
+var myImage = [];
+var game = new Phaser.Game(sizeTiles * 5, sizeTiles * 11, Phaser.AUTO);
 
-var game = new Phaser.Game(480, 320, Phaser.AUTO, '', {
+var gameState = {
   preload: function() {
-    this.scale.pageAlignHorizontally = true;
-    this.game.load.image('hueso', '/src/assets/arrowTop.png');
-    // this.game.load.image('flecha', flechaURI);
+    game.load.image('whiteSquarre', '/src/assets/white_squarre.jpg');
+    game.load.image('redSquarre', '/src/assets/red_squarre.png');
+    game.load.image('startArrow', '/src/assets/arrowTop.png');
+    game.load.image('air', '/src/assets/air.png');
+    game.load.image('water', '/src/assets/water.png');
+    game.load.image('fire', '/src/assets/fire.png');
+    game.load.image('earth', '/src/assets/earth.png');
   },
   create: function() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
-    var hueso = game.add.sprite(100, 100, 'hueso');
-    hueso.anchor.setTo(0.5, 1);
-    game.physics.arcade.enable(hueso);
-    hueso.tint = 0xff00ff;
-    hueso.width = 40;
-    hueso.height = 40;
 
-    var huesoCopy = game.add.sprite(
-      game.world.centerX,
-      0,
-      hueso.key,
-      hueso.frame
-    );
-    huesoCopy.anchor.x = 0.5;
-    game.physics.arcade.enable(huesoCopy);
-    huesoCopy.width = 40;
-    huesoCopy.height = 40;
-    huesoCopy.inputEnabled = true;
-    huesoCopy.input.enableDrag();
-    huesoCopy.originalPosition = huesoCopy.position.clone();
-    huesoCopy.events.onDragStop.add(function(currentSprite) {
-      stopDrag(currentSprite, hueso);
+    this.tileGrid = [
+      [1, 0, 1, 0, 1],
+      [0, 0, 0, 1, 0],
+      [0, 0, 0, 1, 0],
+      [0, 1, 0, 1, 0],
+      [1, 0, 1, 0, 0],
+      [1, 0, 0, 0, 1],
+      [0, 1, 0, 0, 0],
+      [0, 1, 0, 0, 0],
+      [0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 0]
+    ];
+    this.initGrid(this.tileGrid);
+    startArrow = this.add.sprite(25, 475, 'startArrow');
+    startArrow.height = 40;
+    startArrow.width = 40;
+    startArrow.anchor.setTo(0.5, 0.5);
+    startArrow.inputEnabled = true;
+    startArrow.events.onInputDown.add(this.alternateStartArrow, this);
+
+    //Création des 4 éléments
+    var air = game.add.sprite(75, 510, 'air');
+    air.width = 35;
+    air.height = 35;
+    game.physics.arcade.enable(air);
+    air.anchor.x = 0.5;
+
+    air.inputEnabled = true;
+    air.input.enableDrag(true);
+    air.originalPosition = air.position.clone();
+    air.events.onDragStop.add(function(currentSprite, pointer) {
+      var line = Math.floor(currentSprite.position.y / 50);
+
+      var column = Math.floor(currentSprite.position.x / 50);
+
+      if (this.tileGrid[line][column] === 0)
+        currentSprite.position.copyFrom({
+          y: line * 50 + 10,
+          x: column * 50 + 25
+        });
+      else currentSprite.position.copyFrom(currentSprite.originalPosition);
     }, this);
 
-    // this.flecha = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'flecha');
-    // this.flecha.anchor.set(0.5);
+    fire = this.add.sprite(125, 525, 'fire');
+    fire.width = 35;
+    fire.height = 35;
+    game.physics.arcade.enable(fire);
+    fire.inputEnabled = true;
+    fire.input.enableDrag(true);
+    fire.originalPosition = fire.position.clone();
+    fire.events.onDragStop.add(function(currentSprite) {
+      this.stopDrag(currentSprite, myImage);
+    }, this);
+
+    water = this.add.sprite(175, 525, 'water');
+    water.width = 30;
+    water.height = 40;
+    water.anchor.setTo(0.5, 0.5);
+    water.inputEnabled = true;
+    water.input.enableDrag(true);
+
+    earth = this.add.sprite(225, 525, 'earth');
+    earth.width = 40;
+    earth.height = 40;
+    earth.anchor.setTo(0.5, 0.5);
+    earth.inputEnabled = true;
+    earth.input.enableDrag(true);
   },
-  stopDrag: function(currentSprite, endSprite) {
-    if (
-      !this.game.physics.arcade.overlap(currentSprite, endSprite, function() {
-        currentSprite.input.draggable = false;
-        currentSprite.position.copyFrom(endSprite.position);
-        currentSprite.anchor.setTo(endSprite.anchor.x, endSprite.anchor.y);
-      })
-    ) {
-      currentSprite.position.copyFrom(currentSprite.originalPosition);
+  alternateStartArrow: function() {
+    if (startArrow.angle === 0) startArrow.angle = 90;
+    else startArrow.angle = 0;
+  },
+  update: function() {},
+  initGrid: function(tileGrid) {
+    let count = -1;
+    for (let i = 0; i < tileGrid.length; i++) {
+      for (let j = 0; j < tileGrid[i].length; j++) {
+        var image;
+        switch (tileGrid[i][j]) {
+          case 1:
+            image = 'redSquarre';
+            break;
+
+          default:
+            image = 'whiteSquarre';
+            break;
+        }
+        count++;
+        myImage[count] = game.add.sprite(sizeTiles * j, sizeTiles * i, image);
+        myImage[count].width = sizeTiles;
+        myImage[count].height = sizeTiles;
+        if (tileGrid[i][j] === 0) game.physics.arcade.enable(myImage[count]);
+      }
     }
   }
-});
+};
+
+game.state.add('gameState', gameState);
+game.state.start('gameState');
