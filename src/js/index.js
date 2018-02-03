@@ -42,7 +42,6 @@ var gameState = {
     air.height = 35;
     game.physics.arcade.enable(air);
     air.anchor.x = 0.5;
-
     air.inputEnabled = true;
     air.input.enableDrag(true);
     air.originalPosition = air.position.clone();
@@ -59,30 +58,66 @@ var gameState = {
       else currentSprite.position.copyFrom(currentSprite.originalPosition);
     }, this);
 
-    fire = this.add.sprite(125, 525, 'fire');
+    fire = this.add.sprite(110, 510, 'fire');
     fire.width = 35;
     fire.height = 35;
     game.physics.arcade.enable(fire);
+    air.anchor.x = 0.5;
     fire.inputEnabled = true;
     fire.input.enableDrag(true);
     fire.originalPosition = fire.position.clone();
-    fire.events.onDragStop.add(function(currentSprite) {
-      this.stopDrag(currentSprite, myImage);
+    fire.events.onDragStop.add(function(currentSprite, pointer) {
+      var line = Math.floor(currentSprite.position.y / 50);
+
+      var column = Math.floor(currentSprite.position.x / 50);
+
+      if (this.tileGrid[line][column] === 0)
+        currentSprite.position.copyFrom({
+          y: line * 50 + 10,
+          x: column * 50 + 5
+        });
+      else currentSprite.position.copyFrom(currentSprite.originalPosition);
     }, this);
 
-    water = this.add.sprite(175, 525, 'water');
+    water = this.add.sprite(175, 505, 'water');
     water.width = 30;
     water.height = 40;
-    water.anchor.setTo(0.5, 0.5);
+    water.anchor.x = 0.5;
     water.inputEnabled = true;
     water.input.enableDrag(true);
+    water.originalPosition = water.position.clone();
+    water.events.onDragStop.add(function(currentSprite, pointer) {
+      var line = Math.floor(currentSprite.position.y / 50);
 
-    earth = this.add.sprite(225, 525, 'earth');
+      var column = Math.floor(currentSprite.position.x / 50);
+
+      if (this.tileGrid[line][column] === 0)
+        currentSprite.position.copyFrom({
+          y: line * 50 + 5,
+          x: column * 50 + 25
+        });
+      else currentSprite.position.copyFrom(currentSprite.originalPosition);
+    }, this);
+
+    earth = this.add.sprite(225, 505, 'earth');
     earth.width = 40;
     earth.height = 40;
-    earth.anchor.setTo(0.5, 0.5);
+    earth.anchor.x = 0.5;
     earth.inputEnabled = true;
     earth.input.enableDrag(true);
+    earth.originalPosition = earth.position.clone();
+    earth.events.onDragStop.add(function(currentSprite, pointer) {
+      var line = Math.floor(currentSprite.position.y / 50);
+
+      var column = Math.floor(currentSprite.position.x / 50);
+
+      if (this.tileGrid[line][column] === 0)
+        currentSprite.position.copyFrom({
+          y: line * 50 + 5,
+          x: column * 50 + 25
+        });
+      else currentSprite.position.copyFrom(currentSprite.originalPosition);
+    }, this);
   },
   alternateStartArrow: function() {
     if (startArrow.angle === 0) startArrow.angle = 90;
