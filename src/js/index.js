@@ -8,6 +8,9 @@ var gameState = {
     game.load.image('redSquarre', '/src/assets/red_squarre.png');
     game.load.image('startArrow', '/src/assets/arrowTop.png');
     game.load.image('air', '/src/assets/air.png');
+    game.load.image('water', '/src/assets/water.png');
+    game.load.image('fire', '/src/assets/fire.png');
+    game.load.image('earth', '/src/assets/earth.png');
   },
   create: function() {
     this.tileWidth = '100px';
@@ -33,10 +36,58 @@ var gameState = {
     startArrow.inputEnabled = true;
     startArrow.events.onInputDown.add(this.alternateStartArrow, this);
 
+    //Création des 4 éléments
     air = this.add.sprite(75, 525, 'air');
-    air.anchor.x = 0.5;
-    this.game.physics.arcade.enable(air);
+    air.width = 35;
+    air.height = 35;
+    air.anchor.setTo(0.5, 0.5);
     air.inputEnabled = true;
+    air.input.enableDrag(true);
+    // startArrow.events.onDragStop.add(function(currentSprite) {
+    //   this.stopDrag(currentSprite, this.air);
+    // }, this);
+    fire = this.add.sprite(125, 525, 'fire');
+    fire.width = 35;
+    fire.height = 35;
+    fire.anchor.setTo(0.5, 0.5);
+    fire.inputEnabled = true;
+    fire.input.enableDrag(true);
+
+    water = this.add.sprite(175, 525, 'water');
+    water.width = 30;
+    water.height = 40;
+    water.anchor.setTo(0.5, 0.5);
+    water.inputEnabled = true;
+    water.input.enableDrag(true);
+
+    earth = this.add.sprite(225, 525, 'earth');
+    earth.width = 40;
+    earth.height = 40;
+    earth.anchor.setTo(0.5, 0.5);
+
+    air1 = this.add.sprite(75, 525, 'air');
+    air1.width = 35;
+    air1.height = 35;
+    air1.anchor.setTo(0.5, 0.5);
+    this.game.physics.arcade.enable(this.air1);
+
+    fire1 = this.add.sprite(125, 525, 'fire');
+    fire1.width = 35;
+    fire1.height = 35;
+    fire1.anchor.setTo(0.5, 0.5);
+    this.game.physics.arcade.enable(this.fire1);
+
+    water1 = this.add.sprite(175, 525, 'water');
+    water1.width = 30;
+    water1.height = 40;
+    water1.anchor.setTo(0.5, 0.5);
+    this.game.physics.arcade.enable(this.water1);
+
+    earth1 = this.add.sprite(225, 525, 'earth');
+    earth1.width = 40;
+    earth1.height = 40;
+    earth1.anchor.setTo(0.5, 0.5);
+    this.game.physics.arcade.enable(this.earth1);
   },
   alternateStartArrow: function() {
     if (startArrow.angle === 0) startArrow.angle = 90;
