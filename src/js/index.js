@@ -19,7 +19,7 @@ var game = new Phaser.Game(480, 320, Phaser.AUTO, '', {
     game.physics.arcade.enable(hueso);
     hueso.tint = 0xff00ff;
 
-    huesoCopy = game.add.sprite(200, 200, 'huesoCopy');
+    huesoCopy = game.add.sprite(100, 100, 'huesoCopy');
     huesoCopy.anchor.x = 0.5;
     huesoCopy.width = 40;
     huesoCopy.height = 40;
