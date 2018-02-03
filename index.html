@@ -12,21 +12,25 @@
 		html,
 		body {
 			box-sizing: border-box;
+			height: 100%;
 		}
 
 		html,
 		body {
-			margin: 10px;
+			height: 100%;
+			margin: 0;
 		}
 
-		canvas {
-			margin: 0 auto;
+		#mindGame {
+			margin: auto;
+			display: table;
 		}
 	</style>
 </head>
 
 <body>
-	<script src="./src/js/index.js"></script>
+	<div id="mindGame"></div>
+	<script>document.write('<script src="./src/js/index.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>')</script>
 </body>
 
 </html>

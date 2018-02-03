@@ -1,121 +1,150 @@
 var sizeTiles = 50;
-var startArrow;
-var game = new Phaser.Game(sizeTiles * 5, sizeTiles * 11, Phaser.AUTO);
+var widthGame = sizeTiles * 5;
+var heightGame = sizeTiles * 11;
+var obstacle;
+var notObstacle;
+var laser;
+var spaceKey;
+var line;
+var positionLine = [25, 475];
+var lineTab = 9;
+var columnTab = 4;
+var game = new Phaser.Game(widthGame, heightGame, Phaser.AUTO, 'mindGame');
 
 var gameState = {
-  preload: function() {
-    game.load.image('whiteSquarre', '/src/assets/white_squarre.jpg');
-    game.load.image('redSquarre', '/src/assets/red_squarre.png');
-    game.load.image('startArrow', '/src/assets/arrowTop.png');
-    game.load.image('air', '/src/assets/air.png');
-    game.load.image('water', '/src/assets/water.png');
-    game.load.image('fire', '/src/assets/fire.png');
-    game.load.image('earth', '/src/assets/earth.png');
-  },
-  create: function() {
-    game.physics.startSystem(Phaser.Physics.ARCADE);
+	preload: function() {
+		game.load.image('whiteSquarre', '/src/assets/white_squarre.jpg');
+		game.load.image('redSquarre', '/src/assets/red_squarre.png');
+		game.load.image('startArrow', '/src/assets/arrowTop.png');
+		game.load.image('air', '/src/assets/air.png');
+		game.load.image('water', '/src/assets/water.png');
+		game.load.image('fire', '/src/assets/fire.png');
+		game.load.image('earth', '/src/assets/earth.png');
+	},
+	create: function() {
+		game.physics.startSystem(Phaser.Physics.ARCADE);
+		this.tileGrid = [
+			[1, 0, 1, 0, 1],
+			[0, 0, 0, 1, 0],
+			[0, 0, 0, 1, 0],
+			[0, 1, 0, 1, 0],
+			[0, 0, 1, 0, 0],
+			[1, 0, 0, 0, 1],
+			[0, 1, 0, 0, 0],
+			[0, 1, 0, 0, 0],
+			[0, 0, 1, 0, 0],
+			[0, 0, 0, 0, 0],
+		];
 
-    this.tileGrid = [
-      [1, 0, 1, 0, 1],
-      [0, 0, 0, 1, 0],
-      [0, 0, 0, 1, 0],
-      [0, 1, 0, 1, 0],
-      [1, 0, 1, 0, 0],
-      [1, 0, 0, 0, 1],
-      [0, 1, 0, 0, 0],
-      [0, 1, 0, 0, 0],
-      [0, 0, 1, 0, 0],
-      [0, 0, 0, 0, 0]
-    ];
-    this.initGrid(this.tileGrid);
-    startArrow = this.add.sprite(25, 475, 'startArrow');
-    startArrow.height = 40;
-    startArrow.width = 40;
-    startArrow.anchor.setTo(0.5, 0.5);
-    startArrow.inputEnabled = true;
-    startArrow.events.onInputDown.add(this.alternateStartArrow, this);
+		this.initGrid(this.tileGrid);
 
-    //Création des 4 éléments
-    air = this.add.sprite(75, 525, 'air');
-    air.width = 35;
-    air.height = 35;
-    air.anchor.setTo(0.5, 0.5);
-    air.inputEnabled = true;
-    air.input.enableDrag(true);
-    // startArrow.events.onDragStop.add(function(currentSprite) {
-    //   this.stopDrag(currentSprite, this.air);
-    // }, this);
-    fire = this.add.sprite(125, 525, 'fire');
-    fire.width = 35;
-    fire.height = 35;
-    fire.anchor.setTo(0.5, 0.5);
-    fire.inputEnabled = true;
-    fire.input.enableDrag(true);
+		air = this.add.sprite(75, 525, 'air');
+		air.width = 35;
+		air.height = 35;
+		air.anchor.setTo(0.5, 0.5);
+		air.inputEnabled = true;
+		air.input.enableDrag(true);
 
-    water = this.add.sprite(175, 525, 'water');
-    water.width = 30;
-    water.height = 40;
-    water.anchor.setTo(0.5, 0.5);
-    water.inputEnabled = true;
-    water.input.enableDrag(true);
+		fire = this.add.sprite(125, 525, 'fire');
+		fire.width = 35;
+		fire.height = 35;
+		fire.anchor.setTo(0.5, 0.5);
+		fire.inputEnabled = true;
+		fire.input.enableDrag(true);
 
-    earth = this.add.sprite(225, 525, 'earth');
-    earth.width = 40;
-    earth.height = 40;
-    earth.anchor.setTo(0.5, 0.5);
-    earth.inputEnabled = true;
-    earth.input.enableDrag(true);
+		water = this.add.sprite(175, 525, 'water');
+		water.width = 30;
+		water.height = 40;
+		water.anchor.setTo(0.5, 0.5);
+		water.inputEnabled = true;
+		water.input.enableDrag(true);
 
-    air1 = this.add.sprite(75, 525, 'air');
-    air1.width = 35;
-    air1.height = 35;
-    air1.anchor.setTo(0.5, 0.5);
-    game.physics.arcade.enable(air1);
+		earth = this.add.sprite(225, 525, 'earth');
+		earth.width = 40;
+		earth.height = 40;
+		earth.anchor.setTo(0.5, 0.5);
+		earth.inputEnabled = true;
+		earth.input.enableDrag(true);
 
-    fire1 = this.add.sprite(125, 525, 'fire');
-    fire1.width = 35;
-    fire1.height = 35;
-    fire1.anchor.setTo(0.5, 0.5);
-    game.physics.arcade.enable(fire1);
+		startArrow = this.add.sprite(25, 475, 'startArrow');
+		startArrow.height = 40;
+		startArrow.width = 40;
+		startArrow.anchor.setTo(0.5, 0.5);
+		startArrow.inputEnabled = true;
+		startArrow.events.onInputDown.add(this.alternateStartArrow, this);
 
-    water1 = this.add.sprite(175, 525, 'water');
-    water1.width = 30;
-    water1.height = 40;
-    water1.anchor.setTo(0.5, 0.5);
-    game.physics.arcade.enable(water1);
+		air = this.add.sprite(75, 525, 'air');
+		air.anchor.x = 0.5;
+		this.game.physics.arcade.enable(air);
+		air.inputEnabled = true;
 
-    earth1 = this.add.sprite(225, 525, 'earth');
-    earth1.width = 40;
-    earth1.height = 40;
-    earth1.anchor.setTo(0.5, 0.5);
-    game.physics.arcade.enable(earth1);
-  },
-  alternateStartArrow: function() {
-    if (startArrow.angle === 0) startArrow.angle = 90;
-    else startArrow.angle = 0;
-  },
-  update: function() {},
-  initGrid: function(tileGrid) {
-    for (let i = 0; i < tileGrid.length; i++) {
-      for (let j = 0; j < tileGrid[i].length; j++) {
-        var image;
-        switch (tileGrid[i][j]) {
-          case 1:
-            image = 'redSquarre';
-            break;
+		game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		game.scale.setShowAll();
+		window.addEventListener('resize', function() {
+			game.scale.refresh();
+		});
+		game.scale.refresh();
 
-          default:
-            image = 'whiteSquarre';
-            break;
-        }
-        var myImage = game.add.sprite(sizeTiles * j, sizeTiles * i, image);
-        myImage.width = sizeTiles;
-        myImage.height = sizeTiles;
-        game.physics.arcade.enable(myImage);
-      }
-    }
-  }
+		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+	},
+	alternateStartArrow: function() {
+		if (startArrow.angle === 0) startArrow.angle = 90;
+		else startArrow.angle = 0;
+	},
+
+	alternateStartArrow: function() {
+		if (startArrow.angle === 0) {
+			startArrow.angle = 90;
+		} else startArrow.angle = 0;
+	},
+
+	update: function() {
+		if (this.spaceKey.isDown) {
+			line = game.add.graphics(0, 0);
+			line.lineStyle(5, 0xff0000, 1);
+			if (startArrow.angle === 90) {
+				while (positionLine[0] <= 300) {
+					line.moveTo(positionLine[0], positionLine[1]);
+					positionLine[0] += 50;
+					line.lineTo(75, 475);
+				}
+			} else {
+						while (positionLine[0] <= 300) {
+							line.moveTo(positionLine[0], positionLine[1]);
+							positionLine[1] -= 50;
+							line.lineTo(75, 475);
+			}
+		}
+	},
+
+	initGrid: function(tileGrid) {
+		for (let i = 0; i < tileGrid.length; i++) {
+			for (let j = 0; j < tileGrid[i].length; j++) {
+				var image;
+				switch (tileGrid[i][j]) {
+					case 1:
+						image = 'redSquarre';
+						break;
+
+					default:
+						image = 'whiteSquarre';
+						break;
+				}
+
+				if (image === 'redSquarre') {
+					var obstacle = game.add.sprite(sizeTiles * j, sizeTiles * i, image);
+					obstacle.width = sizeTiles;
+					obstacle.height = sizeTiles;
+				} else {
+					notObstacle = game.add.sprite(sizeTiles * j, sizeTiles * i, image);
+					notObstacle.width = sizeTiles;
+					notObstacle.height = sizeTiles;
+				}
+			}
+		}
+	},
 };
 
-game.state.add('gameState', gameState);
-game.state.start('gameState');
+game.state.add('Game', gameState, true);
+game.state.start(gameState);
