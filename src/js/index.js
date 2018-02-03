@@ -1,62 +1,45 @@
-var sizeTiles = 50;
-var startArrow;
-var game = new Phaser.Game(sizeTiles * 5, sizeTiles * 11, Phaser.AUTO);
-
-var gameState = {
+var game = new Phaser.Game(480, 320, Phaser.AUTO, '', {
   preload: function() {
-    game.load.image('whiteSquarre', '/src/assets/white_squarre.jpg');
-    game.load.image('redSquarre', '/src/assets/red_squarre.png');
-    game.load.image('startArrow', '/src/assets/arrowTop.png');
+    this.scale.pageAlignHorizontally = true;
+    this.game.load.image('hueso', '/src/assets/fire.png');
+    this.game.load.image('huesoCopy', '/src/assets/arrowTop.png');
+
+    // this.game.load.image('flecha', flechaURI);
   },
   create: function() {
-    this.tileWidth = '100px';
-    this.tileHeight = '100px';
+    this.game.physics.startSystem(Phaser.Physics.ARCADE);
+    hueso = this.game.add.sprite(
+      this.game.world.centerX,
+      this.game.world.height,
+      'hueso'
+    );
+    hueso.height = 40;
+    hueso.width = 40;
+    hueso.anchor.setTo(0.5, 1);
+    game.physics.arcade.enable(hueso);
+    hueso.tint = 0xff00ff;
 
-    this.tileGrid = [
-      [1, 0, 1, 0, 1],
-      [0, 0, 0, 1, 0],
-      [0, 0, 0, 1, 0],
-      [0, 1, 0, 1, 0],
-      [1, 0, 1, 0, 0],
-      [1, 0, 0, 0, 1],
-      [0, 1, 0, 0, 0],
-      [0, 1, 0, 0, 0],
-      [0, 0, 1, 0, 0],
-      [0, 0, 0, 0, 0]
-    ];
-    this.initGrid(this.tileGrid);
-    startArrow = this.add.sprite(25, 475, 'startArrow');
-    startArrow.height = 40;
-    startArrow.width = 40;
-    startArrow.anchor.setTo(0.5, 0.5);
-    startArrow.inputEnabled = true;
-    startArrow.events.onInputDown.add(this.alternateStartArrow, this);
+    huesoCopy = game.add.sprite(200, 200, 'huesoCopy');
+    huesoCopy.anchor.x = 0.5;
+    huesoCopy.width = 40;
+    huesoCopy.height = 40;
+    game.physics.arcade.enable(huesoCopy);
+    huesoCopy.inputEnabled = true;
+    huesoCopy.input.enableDrag();
+    huesoCopy.originalPosition = huesoCopy.position.clone();
+    huesoCopy.events.onDragStop.add(function(currentSprite) {
+      stopDrag(currentSprite, hueso);
+    }, this);
   },
-  alternateStartArrow: function() {
-    if (startArrow.angle === 0) startArrow.angle = 90;
-    else startArrow.angle = 0;
-  },
-  update: function() {},
-  initGrid: function(tileGrid) {
-    for (let i = 0; i < tileGrid.length; i++) {
-      for (let j = 0; j < tileGrid[i].length; j++) {
-        var image;
-        switch (tileGrid[i][j]) {
-          case 1:
-            image = 'redSquarre';
-            break;
-
-          default:
-            image = 'whiteSquarre';
-            break;
-        }
-        var myImage = game.add.sprite(sizeTiles * j, sizeTiles * i, image);
-        myImage.width = sizeTiles;
-        myImage.height = sizeTiles;
-      }
+  stopDrag: function(currentSprite, endSprite) {
+    if (
+      !this.game.physics.arcade.overlap(currentSprite, endSprite, function() {
+        currentSprite.input.draggable = false;
+        currentSprite.position.copyFrom(endSprite.position);
+        currentSprite.anchor.setTo(endSprite.anchor.x, endSprite.anchor.y);
+      })
+    ) {
+      currentSprite.position.copyFrom(currentSprite.originalPosition);
     }
   }
-};
-
-game.state.add('gameState', gameState);
-game.state.start('gameState');
+});
