@@ -27,6 +27,7 @@ var gameState = {
     ];
     this.initGrid(this.tileGrid);
     startArrow = this.add.sprite(25, 475, 'startArrow');
+    startArrowGrill = this.add.sprite(25, 525, 'startArrow');
     startArrow.height = 40;
     startArrow.width = 40;
     startArrow.anchor.setTo(0.5, 0.5);
