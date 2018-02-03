@@ -7,6 +7,7 @@ var gameState = {
     game.load.image('whiteSquarre', '/src/assets/white_squarre.jpg');
     game.load.image('redSquarre', '/src/assets/red_squarre.png');
     game.load.image('startArrow', '/src/assets/arrowTop.png');
+    game.load.image('air', '/src/assets/air.png');
   },
   create: function() {
     this.tileWidth = '100px';
@@ -31,6 +32,11 @@ var gameState = {
     startArrow.anchor.setTo(0.5, 0.5);
     startArrow.inputEnabled = true;
     startArrow.events.onInputDown.add(this.alternateStartArrow, this);
+
+    air = this.add.sprite(75, 525, 'air');
+    air.anchor.x = 0.5;
+    this.game.physics.arcade.enable(air);
+    air.inputEnabled = true;
   },
   alternateStartArrow: function() {
     if (startArrow.angle === 0) startArrow.angle = 90;
@@ -53,6 +59,7 @@ var gameState = {
         var myImage = game.add.sprite(sizeTiles * j, sizeTiles * i, image);
         myImage.width = sizeTiles;
         myImage.height = sizeTiles;
+        game.physics.arcade.enable(myImage);
       }
     }
   }
