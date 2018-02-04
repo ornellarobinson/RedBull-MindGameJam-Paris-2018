@@ -20,9 +20,12 @@ var vent = {
 	direction: 'right',
 };
 
-var toggle = {
-	actualSprite: 'fire',
+var toogleVent = {
+	direction: 'right',
 };
+
+enterPortal = false;
+waterProperty = 0;
 
 var gameState = {
 	preload: function() {
@@ -272,16 +275,21 @@ var gameState = {
 			myImage[44].width = sizeTiles;
 			this.tileGrid[8][4] = 5;
 		}
-		console.log('this.tileGrid: ', this.tileGrid);
 	},
 	update: function() {
 		if (this.spaceKey.isDown) {
 			while (!gameOver) {
-				line = game.add.graphics(0, 0);
-				line.lineStyle(5, '#ffff00', 1);
-				line.moveTo(positionLine[0], positionLine[1]);
-				this.increaseLine();
-				line.lineTo(positionLine[0], positionLine[1]);
+				if (!enterPortal) {
+					line = game.add.graphics(0, 0);
+					line.lineStyle(5, '#ffff00', 1);
+					line.moveTo(positionLine[0], positionLine[1]);
+					this.increaseLine();
+					line.lineTo(positionLine[0], positionLine[1]);
+				} else {
+					line2 = game.add.graphics(0, 0);
+					line2.lineStyle(5, '#ffff00', 1);
+					line2.moveTo(75, 175);
+				}
 			}
 		}
 	},
@@ -331,29 +339,43 @@ var gameState = {
 		}
 	},
 	checkCollision: function() {
-		console.log('lineTab: ', lineTab);
-		console.log('columnTab: ', columnTab);
 		if (lineTab < 0 || columnTab > 4 || columnTab < 0 || lineTab > 10)
 			gameOver = true;
 		if (this.tileGrid[lineTab][columnTab] === 1) gameOver = true;
+		if (lineTab === 5 && columnTab === 4 && waterProperty === 0)
+			gameOver = true;
+		if (lineTab === 3 && columnTab === 1 && waterProperty === 0)
+			gameOver = true;
 	},
 	checkElement: function() {
 		var y = lineTab;
 		var x = columnTab;
 
-		if (this.tileGrid[y][x] === 4) {
-			//elem fire
+		if (this.tileGrid[y][x] === 2) {
+			enterPortal = true;
+			positionLine = [75, 175];
 		}
 		if (this.tileGrid[y][x] === 5) {
-			//elem air
-			lineDirection = vent.direction;
+			lineDirection = 'diagonal';
 		}
 		if (this.tileGrid[y][x] === 6) {
-			//elem water
+			lineDirection = vent.direction;
+			if (y === 0 && x === 2) lineDirection = toogleVent.direction;
+			else if (y === 5 && x === 0) lineDirection = toogleVent.direction;
+			else if (y === 8 && x === 4) lineDirection = toogleVent.direction;
 		}
 		if (this.tileGrid[y][x] === 7) {
+			waterProperty = 1;
+		}
+		if (this.tileGrid[y][x] === 8) {
 			//elem eart
 		}
+	},
+	resetPoint: function() {
+		line2 = game.add.graphics(0, 0);
+		line2.lineStyle(5, '#ffff00', 1);
+		line2.moveTo(25, 50);
+		// this.incrementDiagonal();
 	},
 	increaseLine: function() {
 		this.checkCollision();
@@ -367,6 +389,8 @@ var gameState = {
 				this.incrementDown();
 			} else if (lineDirection === 'left') {
 				this.incrementLeft();
+			} else if (lineDirection === 'diagonal') {
+				this.incrementDiagonal();
 			}
 		}
 	},
@@ -385,6 +409,12 @@ var gameState = {
 	incrementDown() {
 		lineTab += 1;
 		positionLine[1] += 50;
+	},
+	incrementDiagonal() {
+		lineTab -= 1;
+		columnTab += 1;
+		positionLine[1] -= 50;
+		positionLine[0] += 50;
 	},
 };
 
