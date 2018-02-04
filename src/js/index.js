@@ -166,6 +166,8 @@ var gameState = {
 			} else currentSprite.position.copyFrom(currentSprite.originalPosition);
 		}, this);
 
+		this.line = game.add.graphics(0, 0);
+
 		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
 		this.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
@@ -280,15 +282,21 @@ var gameState = {
 		if (this.spaceKey.isDown) {
 			while (!gameOver) {
 				if (!enterPortal) {
-					line = game.add.graphics(0, 0);
-					line.lineStyle(5, '#ffff00', 1);
-					line.moveTo(positionLine[0], positionLine[1]);
+					this.line.lineStyle(5, '#ffff00', 1);
+					this.line.moveTo(positionLine[0], positionLine[1]);
 					this.increaseLine();
-					line.lineTo(positionLine[0], positionLine[1]);
+					this.line.lineTo(positionLine[0], positionLine[1]);
+					if (enterPortal) {
+						positionLine[0] = 75;
+						positionLine[1] = 175;
+						this.line.endFill();
+					}
 				} else {
-					line2 = game.add.graphics(0, 0);
-					line2.lineStyle(5, '#ffff00', 1);
-					line2.moveTo(75, 175);
+					this.line.lineStyle(5, '#ffff00', 2);
+					this.line.moveTo(75, 175);
+					this.increaseLine();
+					this.line.lineTo(positionLine[0], positionLine[1]);
+					gameOver = true;
 				}
 			}
 		}
@@ -353,7 +361,7 @@ var gameState = {
 
 		if (this.tileGrid[y][x] === 2) {
 			enterPortal = true;
-			positionLine = [75, 175];
+			return false;
 		}
 		if (this.tileGrid[y][x] === 5) {
 			lineDirection = 'diagonal';
@@ -370,11 +378,12 @@ var gameState = {
 		if (this.tileGrid[y][x] === 8) {
 			//elem eart
 		}
+		return true;
 	},
 	resetPoint: function() {
-		line2 = game.add.graphics(0, 0);
-		line2.lineStyle(5, '#ffff00', 1);
-		line2.moveTo(25, 50);
+		// line2 = game.add.graphics(25, 50);
+		// line2.lineStyle(5, '#ff00', 1);
+		// line2.moveTo(25, 50);
 		// this.incrementDiagonal();
 	},
 	increaseLine: function() {
