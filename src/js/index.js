@@ -8,6 +8,10 @@ var lineTab = 9;
 var columnTab = 0;
 var lineDirection = 'up';
 var gameOver = false;
+var blockThrough = false;
+
+var previousLine = -1;
+var previousColumn = -1;
 var game = new Phaser.Game(sizeTiles * 5, sizeTiles * 11, Phaser.AUTO);
 
 var fire = {
@@ -50,7 +54,7 @@ var gameState = {
 			[0, 2, 0, 1, 0],
 			[1, 1, 0, 0, 0],
 			[4, 0, 0, 0, 2],
-			[0, 1, 0, 0, 0],
+			[0, 1, 0, 1, 0],
 			[0, 1, 0, 0, 0],
 			[0, 0, 1, 0, 4],
 			[0, 0, 0, 0, 0],
@@ -166,13 +170,17 @@ var gameState = {
 			} else currentSprite.position.copyFrom(currentSprite.originalPosition);
 		}, this);
 
+		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+		this.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
+		this.a.onDown.add(this.rotateAir, this);
+
 		this.line = game.add.graphics(0, 0);
 
 		this.spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
 		this.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
 		this.a.onDown.add(this.rotateAir, this);
-
 		game.time.events.repeat(
 			Phaser.Timer.SECOND * 1,
 			1000,
@@ -192,7 +200,9 @@ var gameState = {
 		}
 	},
 	rotateToggle: function() {
-		if (gameOver) return;
+		if (gameOver) {
+			return;
+		}
 		if (myImage[2].key === 'fire') {
 			var x = myImage[2].position.x;
 			var y = myImage[2].position.y;
@@ -282,21 +292,15 @@ var gameState = {
 		if (this.spaceKey.isDown) {
 			while (!gameOver) {
 				if (!enterPortal) {
-					this.line.lineStyle(5, '#ffff00', 1);
-					this.line.moveTo(positionLine[0], positionLine[1]);
+					line = game.add.graphics(0, 0);
+					line.lineStyle(5, '#ffff00', 1);
+					line.moveTo(positionLine[0], positionLine[1]);
 					this.increaseLine();
-					this.line.lineTo(positionLine[0], positionLine[1]);
-					if (enterPortal) {
-						positionLine[0] = 75;
-						positionLine[1] = 175;
-						this.line.endFill();
-					}
+					line.lineTo(positionLine[0], positionLine[1]);
 				} else {
-					this.line.lineStyle(5, '#ffff00', 2);
-					this.line.moveTo(75, 175);
-					this.increaseLine();
-					this.line.lineTo(positionLine[0], positionLine[1]);
-					gameOver = true;
+					line2 = game.add.graphics(0, 0);
+					line2.lineStyle(5, '#ffff00', 1);
+					line2.moveTo(75, 175);
 				}
 			}
 		}
@@ -349,19 +353,33 @@ var gameState = {
 	checkCollision: function() {
 		if (lineTab < 0 || columnTab > 4 || columnTab < 0 || lineTab > 10)
 			gameOver = true;
-		if (this.tileGrid[lineTab][columnTab] === 1) gameOver = true;
+		if (this.tileGrid[lineTab][columnTab] === 1) {
+			if (blockThrough === false) gameOver = true;
+			else if (blockThrough === true) blockThrough = false;
+		}
 		if (lineTab === 5 && columnTab === 4 && waterProperty === 0)
 			gameOver = true;
 		if (lineTab === 3 && columnTab === 1 && waterProperty === 0)
 			gameOver = true;
 	},
 	checkElement: function() {
+		//
+		//
 		var y = lineTab;
 		var x = columnTab;
 
 		if (this.tileGrid[y][x] === 2) {
 			enterPortal = true;
-			return false;
+			positionLine = [75, 175];
+
+			//en bas a gauche
+			if (previousLine === y + 1 && previousColumn === x - 1) {
+				// this.line.lineTo(positionLine[], positionLine)
+			} else if (previousLine === y + 1 && previousColumn === x) {
+				//en bas
+			} else if (previousLine === y && previousColumn === x - 1) {
+				//a droite
+			}
 		}
 		if (this.tileGrid[y][x] === 5) {
 			lineDirection = 'diagonal';
@@ -376,14 +394,16 @@ var gameState = {
 			waterProperty = 1;
 		}
 		if (this.tileGrid[y][x] === 8) {
-			//elem eart
+			//elem earth
+			blockThrough = true;
 		}
-		return true;
+		previousLine = lineTab;
+		previousColumn = columnTab;
 	},
 	resetPoint: function() {
-		// line2 = game.add.graphics(25, 50);
-		// line2.lineStyle(5, '#ff00', 1);
-		// line2.moveTo(25, 50);
+		line2 = game.add.graphics(0, 0);
+		line2.lineStyle(5, '#ffff00', 1);
+		line2.moveTo(25, 50);
 		// this.incrementDiagonal();
 	},
 	increaseLine: function() {
